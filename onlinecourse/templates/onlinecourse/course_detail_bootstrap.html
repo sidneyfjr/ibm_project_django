@@ -40,63 +40,84 @@
     </nav>
 
     <!-- Page content -->
-    <div class="container-fluid">
+    <div class="container-fluid row">
+        <div class="col-6">
             <h2>{{ course.name }}</h2>
-            <div class="card-columns-vertical">
-                {% for lesson in course.lesson_set.all %}
-                    <div class="card mt-1">
-                        <div class="card-header"><h5>Lesson {{lesson.order|add:1}}: {{lesson.title}}</h5></div>
-                        <div class="card-body">{{lesson.content}}</div>
-                    </div>
-                {% endfor %}
-            </div>
-            <!-- Task: show questions and choices -->
-            <!-- <HINT> Use Bootstrap Collapse to hide exam first, more details could be found here
-            https://www.w3schools.com/bootstrap4/bootstrap_collapse.asp-->
-
-            <!--
-
-            A collapse example here:
-            <div id="exam" class="collapse">
-                Click to expand elements within the collapse div
-                </div>
-
-            -->
-
-            <!-- <HINT> If user is authenticated, show course exam with a list of question -->
-
-            <!-- <HINT> Each example will have many questions -->
-
-            <!-- <HINT> Each question will have many choices -->
-
-
-            <!-- <HINT> Create a form to collect the selected choices for all questions -->
-            <!-- <HINT> For each question choice, you may create a checkbox input like
-            <input type="check" name="choice_{{choice.id}}" id="{{choice.id}}" ...>
-            -->
-
-            <!-- A choice submission form example
-            <form id="questionform" action="point to a submit view" method="post">
-                        ... for each question in the course ...
+                <div class="card-columns-vertical">
+                    {% for lesson in course.lesson_set.all %}
                         <div class="card mt-1">
-                            <div class="card-header"><h5>{{ question.question_text}}</h5></div>
-                            {% csrf_token %}
-                            <div class="form-group">
-                               ... for each choice in the question ...
-                                <div class="form-check">
-                                    <label class="form-check-label">
-                                        <input type="checkbox" name="choice_{{choice.id}}"
-                                               class="form-check-input" id="{{choice.id}}"
-                                               value="{{choice.id}}">{{ choice.choice_text }}
-                                    </label>
-                                </div>
-                            </div>
+                            <div class="card-header"><h5>Lesson {{lesson.order|add:1}}: {{lesson.title}}</h5></div>
+                            <div class="card-body">{{lesson.content}}</div>
                         </div>
-                    <input class="btn btn-success btn-block" type="submit" value="Submit">
-            </form> -->
+                    {% endfor %}
+                </div>
+                <!-- Task: show questions and choices -->
+                <!-- <HINT> Use Bootstrap Collapse to hide exam first, more details could be found here
+                https://www.w3schools.com/bootstrap4/bootstrap_collapse.asp-->
 
-            <!--Check here to see more details Bootstrap checkbox
-             https://www.w3schools.com/bootstrap4/bootstrap_forms_inputs.asp-->
+                <!--
+                A collapse example here:
+                <div id="exam" class="collapse">
+                    Click to expand elements within the collapse div
+                    </div>
+                -->
+
+
+                <!--Check here to see more details Bootstrap checkbox
+                 https://www.w3schools.com/bootstrap4/bootstrap_forms_inputs.asp-->
+        </div>
+        <div class="col-6">
+                        <!-- <HINT> If user is authenticated, show course exam with a list of question -->
+            {% if user.is_authenticated %}
+                    <!-- A choice submission form example
+                    <form id="questionform" action="point to a submit view" method="post">
+                                ... for each question in the course ...
+                                <div class="card mt-1">
+                                    <div class="card-header"><h5>{{ question.question_text}}</h5></div>
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                       ... for each choice in the question ...
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="checkbox" name="choice_{{choice.id}}"
+                                                       class="form-check-input" id="{{choice.id}}"
+                                                       value="{{choice.id}}">{{ choice.choice_text }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            <input class="btn btn-success btn-block" type="submit" value="Submit">
+                    </form> -->
+                <div class="card" data-toggle="collapse" href="#examCollapseId">
+                    <div class="card-header">
+                    <b>Start Exam</b>
+                    </div>
+                </div>
+                <div id="examCollapseId" class="collapse">
+                    <form id="questionform" action="{% url 'onlinecourse:submit' course_id=course.id %}" method="post">
+                        {% for question in course.all_questions %}
+                                <div class="card mt-1">
+                                    <div class="card-header"><h5>{{ question.question_text}}</h5></div>
+                                    {% csrf_token %}
+                                    {% for choice in question.all_choices %}
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="checkbox" name="choice_{{choice.id}}_{{ question.id }}"
+                                                       class="form-check-input" id="{{choice.id}}"
+                                                       value="{{choice.id}}">{{ choice.choice_text }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                        {% endfor %}
+                            <input class="btn btn-success btn-block" type="submit" value="Submit">
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+
     </div>
 </body>
 </html>
